@@ -18,6 +18,7 @@ import asyncio
 sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from config import settings
+from src.presentation.controllers.auth_controller import router as auth_router
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -45,7 +46,10 @@ app.add_middleware(
 # Security
 security = HTTPBearer()
 
-# Função de autenticação simples
+# Incluir router de autenticação
+app.include_router(auth_router)
+
+# Função de autenticação simples (para compatibilidade)
 async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):
     if credentials.credentials != "admin-token-example":
         raise HTTPException(
