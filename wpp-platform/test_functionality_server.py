@@ -25,7 +25,10 @@ logger = logging.getLogger(__name__)
 app = FastAPI(
     title="WhatsApp Platform API - Teste Funcionalidade",
     description="API para teste da plataforma de atendimento automático via WhatsApp",
-    version="2.0.0"
+    version="2.0.0",
+    docs_url="/docs",
+    redoc_url="/redoc",
+    openapi_url="/openapi.json"
 )
 
 # Configurar CORS
@@ -49,6 +52,19 @@ async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(secur
             headers={"WWW-Authenticate": "Bearer"},
         )
     return credentials.credentials
+
+# Redirect para api-docs
+@app.get("/api-docs")
+async def api_docs_redirect():
+    """Redirect para a documentação correta"""
+    from fastapi.responses import RedirectResponse
+    return RedirectResponse(url="/docs")
+
+# Favicon endpoint
+@app.get("/favicon.ico")
+async def favicon():
+    """Favicon para evitar erro 404"""
+    return {"message": "No favicon configured"}
 
 # Rotas básicas
 @app.get("/")
