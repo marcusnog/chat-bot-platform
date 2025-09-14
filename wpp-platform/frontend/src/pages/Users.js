@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '../contexts/AuthContext';
+import apiService from '../services/api';
 import { 
   Search, 
   Filter, 
@@ -89,12 +90,29 @@ const Users = () => {
       setIsLoading(true);
       setError(null);
       try {
-        // Por enquanto, manter dados mockados
-        // TODO: Implementar chamada para API real
-        console.log('Carregando usuários...');
+        const usersData = await apiService.getUsers({
+          skip: 0,
+          limit: 100
+        });
+        
+        // Converter dados da API para o formato esperado
+        const formattedUsers = usersData.map(user => ({
+          id: user.id,
+          name: user.name,
+          phone: user.phone,
+          email: user.email,
+          isActive: user.is_active,
+          createdAt: user.created_at,
+          lastActivity: user.last_activity,
+          conversationCount: user.conversation_count,
+          totalMessages: user.total_messages
+        }));
+        
+        setUsers(formattedUsers);
       } catch (err) {
         setError('Erro ao carregar usuários');
         console.error('Erro ao carregar usuários:', err);
+        // Manter dados mockados em caso de erro
       } finally {
         setIsLoading(false);
       }

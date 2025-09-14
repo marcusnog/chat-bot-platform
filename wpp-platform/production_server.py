@@ -19,6 +19,11 @@ sys.path.append(os.path.dirname(os.path.dirname(__file__)))
 
 from config import settings
 from src.presentation.controllers.auth_controller import router as auth_router
+from src.presentation.controllers.users_controller import router as users_router
+from src.presentation.controllers.conversations_controller import router as conversations_router
+from src.presentation.controllers.messages_controller import router as messages_router
+from src.presentation.controllers.analytics_controller import router as analytics_router
+from src.presentation.controllers.settings_controller import router as settings_router
 
 # Configurar logging
 logging.basicConfig(level=logging.INFO)
@@ -46,8 +51,13 @@ app.add_middleware(
 # Security
 security = HTTPBearer()
 
-# Incluir router de autenticação
+# Incluir todos os routers
 app.include_router(auth_router)
+app.include_router(users_router)
+app.include_router(conversations_router)
+app.include_router(messages_router)
+app.include_router(analytics_router)
+app.include_router(settings_router)
 
 # Função de autenticação simples (para compatibilidade)
 async def verify_token(credentials: HTTPAuthorizationCredentials = Depends(security)):

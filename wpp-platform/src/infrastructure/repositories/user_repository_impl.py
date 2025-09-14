@@ -28,7 +28,7 @@ class UserRepositoryImpl(UserRepository):
                 db_user.name = user.name
                 db_user.email = user.email
                 db_user.is_active = user.is_active
-                db_user.updated_at = user.updated_at
+                db_user.updated_at = user.updated_atnpm install http-proxy-middleware --save-dev
             else:
                 raise ValueError("Usuário não encontrado")
         else:

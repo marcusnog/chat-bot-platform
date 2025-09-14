@@ -11,6 +11,7 @@ import {
   BarChart3
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import apiService from '../services/api';
 
 const Dashboard = () => {
   const [stats, setStats] = useState({
@@ -21,6 +22,53 @@ const Dashboard = () => {
     satisfaction: '4.8/5',
     aiResolutionRate: '78%'
   });
+  const [isLoading, setIsLoading] = useState(true);
+
+  // Carregar dados do dashboard
+  useEffect(() => {
+    const loadDashboardData = async () => {
+      try {
+        setIsLoading(true);
+        
+        // Carregar dados em paralelo
+        const [analyticsData, userStats, conversationStats, messageStats] = await Promise.all([
+          apiService.getAnalyticsOverview(),
+          apiService.getUserStats(),
+          apiService.getConversationStats(),
+          apiService.getMessageStats()
+        ]);
+
+        // Atualizar estatísticas
+        setStats({
+          totalConversations: analyticsData.total_conversations,
+          activeConversations: analyticsData.active_conversations,
+          messagesToday: analyticsData.messages_today,
+          responseTime: `${analyticsData.response_time_avg}s`,
+          satisfaction: `${analyticsData.satisfaction_score}/5`,
+          aiResolutionRate: '78%' // Mockado por enquanto
+        });
+
+        // Carregar conversas recentes
+        const conversations = await apiService.getConversations({ limit: 5 });
+        setRecentConversations(conversations.map(conv => ({
+          id: conv.id,
+          phone: conv.user_phone,
+          name: conv.user_name,
+          lastMessage: 'Última mensagem...', // Mockado
+          time: '2 min atrás', // Mockado
+          status: conv.status
+        })));
+
+      } catch (error) {
+        console.error('Erro ao carregar dados do dashboard:', error);
+        // Manter dados mockados em caso de erro
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadDashboardData();
+  }, []);
 
   const [recentConversations, setRecentConversations] = useState([
     {

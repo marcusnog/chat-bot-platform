@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 
 from ...domain.entities.conversation import Conversation
 from ...domain.repositories.conversation_repository import ConversationRepository
-from ...domain.value_objects.conversation_status import ConversationStatus, ConversationStatusValue
+from ...domain.value_objects.conversation_status import ConversationStatus
 from ..database.models import ConversationModel
 
 
@@ -128,20 +128,11 @@ class ConversationRepositoryImpl(ConversationRepository):
     
     def _to_entity(self, db_conversation: ConversationModel) -> Conversation:
         """Converte modelo do banco para entidade do domínio"""
-        status = ConversationStatusValue(
-            status=ConversationStatus(db_conversation.status),
-            timestamp=db_conversation.created_at,  # Usar created_at como fallback
-            reason=db_conversation.status_reason,
-            agent_id=db_conversation.agent_id
-        )
-        
         return Conversation(
             id=db_conversation.id,
             user_id=db_conversation.user_id,
-            whatsapp_conversation_id=db_conversation.whatsapp_conversation_id,
-            status=status,
-            context=db_conversation.context or {},
-            agent_id=db_conversation.agent_id,
+            status=ConversationStatus(db_conversation.status),
             created_at=db_conversation.created_at,
-            updated_at=db_conversation.updated_at
+            updated_at=db_conversation.updated_at,
+            last_message_at=db_conversation.last_message_at
         )

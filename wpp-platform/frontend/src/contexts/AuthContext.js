@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import apiService from '../services/api';
 
 const AuthContext = createContext();
 
@@ -31,34 +32,20 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, password) => {
     try {
-      const response = await fetch('/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        setToken(data.token);
-        setUser(data.user);
-        
-        localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
-        
-        toast.success('Login realizado com sucesso!');
-        return { success: true };
-      } else {
-        const errorData = await response.json();
-        toast.error(errorData.detail || 'Erro ao fazer login');
-        return { success: false, error: errorData.detail };
-      }
+      const data = await apiService.login(email, password);
+      
+      setToken(data.token);
+      setUser(data.user);
+      
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      toast.success('Login realizado com sucesso!');
+      return { success: true };
     } catch (error) {
       console.error('Erro no login:', error);
-      toast.error('Erro de conexão. Tente novamente.');
-      return { success: false, error: 'Erro de conexão' };
+      toast.error(error.message || 'Erro ao fazer login');
+      return { success: false, error: error.message };
     }
   };
 
